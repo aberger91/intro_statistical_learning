@@ -8,9 +8,12 @@ import seaborn as sns
 from quandl_products import *
 
 qproducts = QUANDL_PRODUCTS
-path_to_data = "C:/Users/Andrew/Downloads/data/"
-api_path_ = "C:/Users/Andrew/api/"
-qdl.ApiConfig.api_key = open(api_path_ + "quandl.txt", "r").read()
+api_key_path_ = "C:/Users/Andrew/api/"
+
+try:
+    qdl.ApiConfig.api_key = open(api_key_path_ + "quandl.txt", "r").read()
+except Exception as e:
+    print("could not register quandl key\n%s" % e)
 
 def get_quandl_data(product, 
                     start="2015-01-01", 
@@ -178,7 +181,7 @@ def simulate_poisson():
 
 def knn():
     from sklearn import preprocessing, cross_validation, neighbors
-    path = path_to_data + "breast-cancer-wisconsin.data"
+    path = "breast-cancer-wisconsin.data"
     df = pd.read_csv(path)
     print(df.head())
     
