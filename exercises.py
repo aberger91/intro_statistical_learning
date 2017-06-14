@@ -1,38 +1,51 @@
 import pandas as pd
+import numpy as np
 import matplotlib.pyplot as plt
+import statsmodels.api as sm
 import seaborn as sns
+
 
 def chapter_3():
     #3.8 -> Simple Linear Regression on Auto data set
     dat = pd.read_csv("Auto.csv")
     dat = dat.replace("?", np.nan).dropna()
-    xs, ys = dat["horsepower"].astype(float), dat["mpg"].astype(float)
-    results = pd.ols(y=ys, x=xs)
-    print(results)
-    slope, intercept = results.beta
-    r2, f_stat, p_value = results.r2, results.f_stat['f-stat'], results.p_value['intercept']
-    fit = [slope*x + intercept for x in xs]
-    prediction = results.predict()
+
+    xs = sm.add_constant(dat["horsepower"].astype(float))
+    ys = dat["mpg"].astype(float)
+
+    model = sm.OLS(ys, xs)
+    model = model.fit()
+
+    intercept, slope = model.params
+    r2 = model.rsquared
+    f_stat = model.fvalue
+    p_value = model.pvalues[1]
+    fit = [slope*x + intercept for x in xs["horsepower"]]
+    print(model.summary())
+
+    prediction = model.predict()
     residuals = ys.astype(float) - prediction
     standardized_residuals = (residuals - residuals.mean()) / \
                              (residuals.max() - residuals.min())
-    residual_standard_error = results.rmse
-    percent_error = 100 * residual_standard_error / ys.mean()        
+    #residual_standard_error = results.rmse
+    #percent_error = 100 * residual_standard_error / ys.mean()        
 
+    """
+    Plot
+    """
     f = plt.figure()
     ax = f.add_subplot(221)
     ax2 = f.add_subplot(223)
     ax3 = f.add_subplot(222)
     ax4 = f.add_subplot(224)
-    ax.scatter(xs, ys, label="r2=%f; f=%f; p=%f" % (
-                                                     r2, f_stat, p_value))
-    ax.plot(xs, fit, color="r", label="f(x) = %f * x + %f" % (
-                                               slope, intercept))
+    ax.scatter(xs["horsepower"], ys, label="r2=%f; f=%f; p=%f" % (
+                              r2, f_stat, p_value))
+    ax.plot(xs["horsepower"], fit, color="r", label="f(x) = %f * x + %f" % (
+                                       slope, intercept))
     # non-linear if this plot is not a random scatter plot
-    ax2.scatter(xs, residuals, color="r", label="percent error=%f" % percent_error)
+    ax2.scatter(xs["horsepower"], residuals, color="r")
     ax2.axhline(0, color="k")
-    ax3.scatter(prediction, residuals, label="residual standard error=%f" % residual_standard_error)
-    ax3.axhline(0, color="k")
+    sm.graphics.influence_plot(model, ax=ax3)
     ax4.scatter(prediction, standardized_residuals, label="prediction vs. standardized residuals")
     ax4.axhline(0, color="k")
     for _ax in [ax, ax2, ax3, ax4]:
@@ -47,7 +60,8 @@ def chapter_3():
     plt.show()        
     
     print(dat.corr())
-    results = pd.ols(y=ys, x=xs)
+    results = pd.OLS(y=ys, x=xs)
+    model = sm.OLS(ys, xs)
     print(results)
 
     """
@@ -68,12 +82,15 @@ def chapter_3():
     residual_standard_error = results.rmse
     percent_error = 100 * residual_standard_error / ys.mean()  
     
+    """
+    Plot
+    """
     f = plt.figure()
     ax = f.add_subplot(221)
     ax2 = f.add_subplot(223)
     ax3 = f.add_subplot(222)
     ax4 = f.add_subplot(224)
-    ax.scatter(results.y_fitted, residuals, label='RSE=%f' % residual_standard_error)
+    ax.scatter(results.y_fitted, residuals)
     ax.axhline(0, color="k")
     ax.set_xlabel("y fitted values")
     ax.set_ylabel("residuals")
@@ -81,7 +98,11 @@ def chapter_3():
     ax2.axhline(0, color="k")
     ax2.set_xlabel("y fitted values")
     ax2.set_ylabel("standardized residuals")
+    sm.graphics.influence_plot(model, ax=ax3)
  
     for _ax in [ax, ax2, ax3, ax4]:
         _ax.legend(loc="best")
     plt.show()
+
+if __name__ == "__main__":
+    chapter_3()
