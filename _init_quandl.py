@@ -27,7 +27,11 @@ QUANDL_PRODUCTS = {'GC': 'CHRIS/CME_GC1',
                    'PL': 'CHRIS/CME_PL1',
                    'SI': 'CHRIS/CME_SI4',
                    'RY': 'CHRIS/CME_RY1',
-                   'VXMT': 'CBOE/VXMT'  # Mid-Term VIX
+                   'VXMT': 'CBOE/VXMT',  # Mid-Term VIX
+                   'NROUST': 'FRED/NROUST',
+                   'NROU': 'FRED/NROU',
+                   'UNEMPLOY': 'FRED/UNEMPLOY',
+                   'UNEMPLOY_RATE': 'FRED/UNRATE'
                    }
 
 API_KEY_PATH = "C:/Users/Andrew/api/"

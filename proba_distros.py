@@ -2,6 +2,10 @@ import matplotlib.pyplot as plt
 import scipy.stats as stats
 import numpy as np
 
+def normz(val=0.95):
+    two_tailed_ztest_critical_value = scipy.stats.norm.ppf((1+val)/2)
+    return two_tailed_ztest_critical_value
+
 def binom_pmf(n=100, p=0.5):
     # There are n+1 possible number of "successes": 0 to n.
     x = range(n+1)

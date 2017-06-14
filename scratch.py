@@ -1,6 +1,53 @@
 import pandas as pd
 import matplotlib.pyplot as plt
+import statsmodels.api as sm
+import datetime as dt
 from _init_quandl import get_quandl_data
+import scipy.stats as stats
+
+def calculate_daily_value_at_risk(P, prob, mean, sigma, days_per_year=252.):
+    min_ret = stats.norm.ppf(1-prob, 
+                             mean/days_per_year, 
+                             sigma/np.sqrt(days_per_year))
+    return P - P * (min_ret + 1)
+
+def fedfunds():
+    start, end = "1970-01-01", "2018-01-01"
+
+    es = get_quandl_data("ES",
+                         start=start, 
+                         end=end)
+    ff = get_quandl_data("FF", 
+                         start=start, 
+                         end=end)
+    unemploy = get_quandl_data("UNEMPLOY",
+                               start=start,
+                               end=end)                                  
+    gdp = get_quandl_data("GDP",
+                          start=start,
+                          end=end)
+    features = pd.Series({"FF": ff, "UNEMPLOY": unemploy, "GDP": gdp})
+
+                                              
+    sample_xs = ff.ix[ff.index > dt.datetime(2008, 1, 1)].diff().dropna()
+    sample_ys = es.ix[es.index > dt.datetime(2008, 1, 1)].diff().dropna()
+
+    sample_xs = sample_xs.ix[sample_ys.index]
+
+    fig = plt.figure()
+    ax = fig.add_subplot(111)
+    ax.scatter(sample_xs["Value"], sample_ys["Settle"])
+
+    for ix, x, y in list(zip(sample_xs.index, 
+                             sample_xs["Value"], 
+                             sample_ys["Settle"])):
+        ax.annotate(ix, xy=(x, y))
+        
+    model = sm.OLS(sample_ys["Settle"], sample_xs["Value"])
+    fit = model.fit()
+    print(fit.summary())
+
+    plt.show()
 
 def knn():
     from sklearn import preprocessing, cross_validation, neighbors
