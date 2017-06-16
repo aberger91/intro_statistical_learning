@@ -2,7 +2,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import statsmodels.api as sm
 import datetime as dt
-from _init_quandl import get_quandl_data
+from quandl_utils import Quandl
 import scipy.stats as stats
 
 def calculate_daily_value_at_risk(P, prob, mean, sigma, days_per_year=252.):
@@ -14,18 +14,19 @@ def calculate_daily_value_at_risk(P, prob, mean, sigma, days_per_year=252.):
 def fedfunds():
     start, end = "1970-01-01", "2018-01-01"
 
-    es = get_quandl_data("ES",
-                         start=start, 
-                         end=end)
-    ff = get_quandl_data("FF", 
-                         start=start, 
-                         end=end)
-    unemploy = get_quandl_data("UNEMPLOY",
-                               start=start,
-                               end=end)                                  
-    gdp = get_quandl_data("GDP",
-                          start=start,
-                          end=end)
+    qdl = Quandl()
+    es = qdl.get_data("ES",
+                      start=start, 
+                      end=end)
+    ff = qdl.get_data("FF", 
+                      start=start, 
+                      end=end)
+    unemploy = qdl.get_data("UNEMPLOY",
+                            start=start,
+                            end=end)                                  
+    gdp = qdl.get_data("GDP",
+                       start=start,
+                       end=end)
     features = pd.Series({"FF": ff, "UNEMPLOY": unemploy, "GDP": gdp})
 
                                               
@@ -177,15 +178,6 @@ def n_neighbors(n=15):
                   % (n, weights))
     plt.show()
     
-def fx_regression(pairs=["6A", "6E", "6B", "6J", "6S", "ZN", "ES"]):
-    from quandl import ApiConfig
-    from _init_quandl import API_KEY_PATH
-    try:
-        ApiConfig.api_key = open(API_KEY_PATH + "quandl.txt", "r").read()
-    except Exception as e:
-        print("could not register quandl key\n%s" % e)
-    dat = {p:get_quandl_data(p) for p in pairs}
-    return dat
-    
+
 if __name__ == "__main__":
-    fx_regression()
+    n_neighbors()
