@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 import statsmodels.api as sm
 import seaborn as sns
 from statsmodels.stats import outliers_influence
+import math
 
 def chapter_3():
     """
@@ -189,11 +190,28 @@ def chapter_4():
     '''
     Notes for Logistic Regression:
     
-    - coefficients -> give the change in log odds with a one-unit increase in X
+    - 1. Estimate Coefficients (maximum likelihood)
+    - 2. Make Predictions (logistic function)   
+     
+    - coefficients
+        - b1 > 0: increasing X will increase p(x)
+        - b1 < 0: increasing X will decrease p(x)
+    
+    - maximum likelihood function
+        - estimates b0 and b1 such that plugging in estimates yields numbers 
+           close to one for p(x) = True and close to zero for p(x) = False
+           
+    - z-statistic -> b1_hat / SE(b1_hat)
     '''
+    def logistic_function(b0, b1, x):
+        '''
+        given the coefficients of a logit model
+        calculate y_hat for an x value
+        '''
+        odds = math.exp(b0 + b1 * x)
+        f = odds / (1 + odds)
+        return f
 
-    
-    
     
     
 if __name__ == "__main__":
