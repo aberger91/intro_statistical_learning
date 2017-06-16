@@ -9,6 +9,15 @@ def chapter_3():
     """
     Notes for Linear Regression
     
+    - coefficients -> give average change in Y with a one-unit increase in X
+    
+    - confidence interval -> B1_hat +- 2 * SE(B1_hat)
+        - 95% chance the interval contains true value of B
+        - SE(B1_hat) -> var(e) / SSE
+    
+    - t-statistic
+        - t = (B1_hat - 0)/ SE(B1_hat)
+        
     -  test for synergy (additive assumption)
         - effect of each predictor on response is independent of other predictors
         - include interaction term -> x1 * x2 
@@ -16,8 +25,8 @@ def chapter_3():
             - if results in substantial increase in r2, then not additive (synergy exists)
 
     - relationship exists
-        - p value
-        - F statistc
+        - p value < 0.0005 or < 0.0001
+        - F statistic greater than 1
 
     - strength of relationship
         - RSE -> estimates standard deviation of response from regression line
@@ -28,13 +37,26 @@ def chapter_3():
         - prediction interval (individual response)
         - confidence interval (average response)
         
-    - tests for linearity
+    - non-linearity
         - residual plots (fitted values vs. studentized/standardized residuals)
+        - if residual plots are not random, transform with log(x), sqrt(x), or x2
+        
+    - correlation of error terms
+        - will underestimate p value and narrow confidence/prediction intervals
+        
+    - heteroscedasticity (funnel shape of residual plot)
+        - non-constant variances in the errors
+        - if exists, transform the response with log(y) or sqrt(y)
+    
+    - co-linearity of features
         - (VIF) variance inflation factor -> 1 / (1 - r2)
         - correlation matrix
+        - reduces t-statistic and increases standard error
         
     - outliers
-        - leverage (influence_plot)
+        - leverage -> high impact on RSE and/or regression line
+        - look at studentized residuals (observations > 3 are outliers)
+        - influence (leverage) plots
     """
     #3.8 -> Simple Linear Regression on Auto data set
     dat = pd.read_csv("Auto.csv")
@@ -162,6 +184,17 @@ def chapter_3():
     for _ax in [ax, ax2, ax3, ax4]:
         _ax.legend(loc="best")
     plt.show()
+    
+def chapter_4():
+    '''
+    Notes for Logistic Regression:
+    
+    - coefficients -> give the change in log odds with a one-unit increase in X
+    '''
 
+    
+    
+    
+    
 if __name__ == "__main__":
     chapter_3()
