@@ -1,6 +1,4 @@
 from quandl import ApiConfig
-from matplotlib import style as mpl_style
-mpl_style.use(["ggplot"])
 from _init_quandl import API_KEY_PATH
 
 try:
@@ -9,6 +7,8 @@ except Exception as e:
     print("could not register quandl key\n%s" % e)
     
 if __name__ == "__main__":
+    from exercises import *
+
     """
     x = 98.24923076
     mean = 98.6

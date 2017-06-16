@@ -1,6 +1,8 @@
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+from matplotlib import style as mpl_style
+mpl_style.use(["ggplot"])
 import statsmodels.api as sm
 import seaborn as sns
 from statsmodels.stats import outliers_influence
