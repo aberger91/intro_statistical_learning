@@ -2,7 +2,6 @@ import os
 import quandl as qdl
 import warnings
 
-
 class QuandlError(Exception):
     errors = {
               0: 'could not register API token',

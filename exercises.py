@@ -213,8 +213,7 @@ def chapter_4():
         odds = math.exp(b0 + b1 * x)
         f = odds / (1 + odds)
         return f
-
     
     
 if __name__ == "__main__":
-    chapter_3()
+    chapter_4()
