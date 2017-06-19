@@ -5,6 +5,85 @@ import datetime as dt
 import numpy as np
 from quandl_utils import Quandl
 import scipy.stats as stats
+from sklearn.metrics import mean_squared_error
+
+def arima_predict_out_of_sample(res):
+    '''
+    res = results from statsmodels.tsa.arima_model.ARIMA().fit(X, y)
+    '''
+    # this is the nsteps ahead predictor function
+    from statsmodels.tsa.arima_model import _arma_predict_out_of_sample
+    res = sm.tsa.ARMA(y, (3, 2)).fit(trend="nc")
+
+    # get what you need for predicting one-step ahead
+    params = res.params
+    residuals = res.resid
+    p = res.k_ar
+    q = res.k_ma
+    k_exog = res.k_exog
+    k_trend = res.k_trend
+    steps = 1
+
+    new_prediction_one_step_ahead = _arma_predict_out_of_sample(params, 
+                                                                steps, 
+                                                                residuals, 
+                                                                p, 
+                                                                q, 
+                                                                k_trend, 
+                                                                k_exog, 
+                                                                endog=y, 
+                                                                exog=None, 
+                                                                start=len(y)
+                                                                )
+    # tack this on to y, then update residuals
+    return new_prediction_one_step_ahead
+
+def autocorr():
+    import pandas.tools.plotting as ptp
+    from statsmodels.graphics.tsaplots import plot_acf
+    from statsmodels.tsa.ar_model import AR
+
+    qdl = Quandl()
+    start, end = "2017-01-01", "2018-01-01"
+    es = qdl.get_data("ES", start=start, end=end)
+    print(es.head())
+
+    xs = es['Settle']
+    print(type(xs.index))
+
+    ptp.lag_plot(xs)
+    #plt.show()
+
+    ptp.autocorrelation_plot(xs)
+    #plt.show()
+
+    plot_acf(xs, lags=7)
+    #plt.show()
+
+    train, test = xs[1:len(xs) - 7], xs[len(xs) - 7:]
+
+    model = AR(train, dates=xs.index)
+    ar_fit = model.fit()
+
+    print('Lag: %s' % ar_fit.k_ar)
+    print('Coefficients: %s' % ar_fit.params)
+
+    #TODO fix error 'unknown string format'
+    ar_predicts = ar_fit.predict(start=train[0], 
+                                 end=train[len(train) -1],
+                                 dynamic=False)
+
+    for x in range(len(ar_predicts)):
+        print('predicted: %f vs. expected: %f' % (ar_predicts[x], test[x]))
+
+    print(len(test), len(ar_predicts))
+
+    error = mean_squared_error(test, ar_predicts)
+    print('Test MSE: %.3f' % error)
+
+    plt.plot(test)
+    plt.show(ar_predicts, color='red')
+    plt.show()
 
 def calculate_daily_value_at_risk(P, prob, mean, sigma, days_per_year=252.):
 	min_ret = stats.norm.ppf(1-prob, 
@@ -16,20 +95,12 @@ def fedfunds():
 	start, end = "1970-01-01", "2018-01-01"
 
 	qdl = Quandl()
-	es = qdl.get_data("ES",
-					  start=start, 
-					  end=end)
-	ff = qdl.get_data("FF", 
-					  start=start, 
-					  end=end)
-	unemploy = qdl.get_data("UNEMPLOY",
-							start=start,
-							end=end)                                  
-	gdp = qdl.get_data("GDP",
-					   start=start,
-					   end=end)
-	features = pd.Series({"FF": ff, "UNEMPLOY": unemploy, "GDP": gdp})
+	es = qdl.get_data("ES", start=start, end=end)
+	ff = qdl.get_data("FF", start=start, end=end)
+	unemploy = qdl.get_data("UNEMPLOY", start=start, end=end)                                  
+	gdp = qdl.get_data("GDP", start=start, end=end)
 
+	features = pd.Series({"FF": ff, "UNEMPLOY": unemploy, "GDP": gdp})
 											  
 	sample_xs = ff.ix[ff.index > dt.datetime(2008, 1, 1)].diff().dropna()
 	sample_ys = es.ix[es.index > dt.datetime(2008, 1, 1)].diff().dropna()
@@ -183,4 +254,5 @@ def n_neighbors(n=15):
 	
 
 if __name__ == "__main__":
-	n_neighbors()
+	#n_neighbors()
+        autocorr()
