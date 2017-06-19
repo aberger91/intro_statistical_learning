@@ -1,38 +1,9 @@
 import matplotlib.pyplot as plt
-import statsmodels.api as sm
+from statsmodels.api import Logit
 import seaborn as sns
 import pandas as pd
 from spam_feature_labels import features
 from prepare_spambase_data import split
-
-def logit_spam_filter():
-    X_train, X_test, Y_train, Y_test = split()
-    logit_model = sm.Logit(Y_train, X_train)
-
-    logit_fit = logit_model.fit()
-
-    logit_predicts = [1 if x > 0.5 else 0 for x in logit_fit.predict(X_test)]
-    return (logit_fit, Y_test, logit_predicts)
-
-    #print(logit_fit.summary())
-    #print('Logit Confidence Intervals\n%s\n' % logit_fit.conf_int())
-    #
-    #b0 = logit_fit.params[0] # intercept coeficent
-    #
-    #significant_values = logit_fit.pvalues.loc[logit_fit.pvalues < 0.0005]
-    #coefficients = logit_fit.params.loc[significant_values.index]
-    #odds_ratios = coefficients.apply(lambda x: 100 * math.exp(x) / (1 + math.exp(x)))
-    #
-    #print("Significant Values\n%s\n" % significant_values)
-    #print("Coefficients\n%s\n" % coefficients)
-    #print("Odds Ratios\n%s\n" % odds_ratios)
-
-#    f = plt.figure()
-#    ax = f.add_subplot(111)
-#    ax.scatter(logit_fit.predict(), logit_fit.resid_response)
-#    ax.set_xlabel('predictions')
-#    ax.set_ylabel('residuals')
-#    plt.show()
 
 def logit_decision_boundary():
     dat = pd.read_csv('../data/spambase.data', names=features)
@@ -77,5 +48,25 @@ def logit_decision_boundary():
     plt.show()
 
 
+#print(logit_fit.summary())
+#print('Logit Confidence Intervals\n%s\n' % logit_fit.conf_int())
+#
+#b0 = logit_fit.params[0] # intercept coeficent
+#
+#significant_values = logit_fit.pvalues.loc[logit_fit.pvalues < 0.0005]
+#coefficients = logit_fit.params.loc[significant_values.index]
+#odds_ratios = coefficients.apply(lambda x: 100 * math.exp(x) / (1 + math.exp(x)))
+#
+#print("Significant Values\n%s\n" % significant_values)
+#print("Coefficients\n%s\n" % coefficients)
+#print("Odds Ratios\n%s\n" % odds_ratios)
+
+#f = plt.figure()
+#ax = f.add_subplot(111)
+#ax.scatter(logit_fit.predict(), logit_fit.resid_response)
+#ax.set_xlabel('predictions')
+#ax.set_ylabel('residuals')
+#plt.show()
+
 if __name__ == '__main__':
-    logit_spam_filter()
+    logit_decision_boundary()

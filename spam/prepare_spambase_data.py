@@ -4,9 +4,9 @@ from statsmodels.api import add_constant
 from pandas import read_csv
 from spam_feature_labels import features
 
-def standardized_split():
+def standardized_train_test_split():
     '''
-    X_train, X_test, Y_train, Y_test = standardized_split()
+    X_train, X_test, Y_train, Y_test = standardized_train_test_split()
     '''
     xs = read_csv('../data/spambase.data', names=features)
     ys = xs.pop('is_spam')
@@ -19,7 +19,7 @@ def standardized_split():
 
     return X_train, X_test, Y_train, Y_test
 
-def split():
+def train_test_split_data():
     '''
     X_train, X_test, Y_train, Y_test = split()
     '''

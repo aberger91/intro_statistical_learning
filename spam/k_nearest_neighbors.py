@@ -23,16 +23,5 @@ def optimize_k(X_train, Y_train):
     optimal_k = neighbors[MSE.index(min(MSE))]
     print("The optimal number of neighbors is %d" % optimal_k)
 
-def k_nearest_neighbors_spam_filter(n_neighbors=1):
-    X_train, X_test, Y_train, Y_test = standardized_split()
-
-    model = KNeighborsClassifier(n_neighbors=n_neighbors, weights='distance')
-    fit = model.fit(X_train, Y_train)
-
-    #  optimize_k(X_train, Y_train)
-    predictions = fit.predict(X_test)
-    return (fit, Y_test, predictions)
-
-
 if __name__ == '__main__':
     k_nearest_neighbors_spam_filter()
