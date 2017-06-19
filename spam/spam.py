@@ -30,30 +30,89 @@
   - Mark Hopkins, Erik Reeber, George Forman, Jaap Suermondt
     Hewlett-Packard Labs, 1501 Page Mill Rd., Palo Alto, CA 94304
 '''
-from regression import logit_spam_filter
-from bayesian import bernoulli_bayes_spam_filter, gaussian_bayes_spam_filter
-from neural_net import neural_network_spam_filter
 from support_vector_machine import support_vector_spam_filter
-from k_nearest_neighbors import k_nearest_neighbors_spam_filter
-from random_forest import random_forest_spam_filter
+from prepare_spambase_data import standardized_split, split
 from sklearn.metrics import (
                             confusion_matrix, 
                             classification_report, 
                             accuracy_score
                             ) 
 
+
+class SpamBaseModels:
+    def random_forest_spam_filter():
+        X_train, X_test, Y_train, Y_test = standardized_split()
+
+        # 57 -> number of features
+        rf = RandomForestClassifier(n_estimators=100, max_features=57)
+
+        fit = rf.fit(X_train, Y_train)
+        random_forest_predicts = rf.predict(X_test)
+
+        return (fit, Y_test, random_forest_predicts)
+
+    def k_nearest_neighbors_spam_filter(n_neighbors=1):
+        X_train, X_test, Y_train, Y_test = standardized_split()
+
+        model = KNeighborsClassifier(n_neighbors=n_neighbors, weights='distance')
+        fit = model.fit(X_train, Y_train)
+
+        #  optimize_k(X_train, Y_train)
+        predictions = fit.predict(X_test)
+        return (fit, Y_test, predictions)
+
+    def bernoulli_bayes_spam_filter():
+        X_train, X_test, Y_train, Y_test = standardized_split()
+
+        model = BernoulliNB()
+        fit = model.fit(X_train, Y_train)
+
+        predictions = fit.predict(X_test)
+        return (fit, Y_test, predictions)
+
+    def gaussian_bayes_spam_filter():
+        X_train, X_test, Y_train, Y_test = standardized_split()
+
+        model = GaussianNB()
+        fit = model.fit(X_train, Y_train)
+
+        predictions = fit.predict(X_test)
+        return (fit, Y_test, predictions)
+
+    def neural_network_spam_filter():
+        X_train, X_test, Y_train, Y_test = standardized_split()
+
+        # 57 -> number of features
+        mlp = MLPClassifier(hidden_layer_sizes=(57, 57, 57), max_iter=1000)
+
+        fit = mlp.fit(X_train, Y_train)
+        mlp_predicts = mlp.predict(X_test)
+
+        return (fit, Y_test, mlp_predicts)
+
+    def logit_spam_filter():
+        X_train, X_test, Y_train, Y_test = split()
+        logit_model = sm.Logit(Y_train, X_train)
+
+        logit_fit = logit_model.fit()
+
+        logit_predicts = [1 if x > 0.5 else 0 for x in logit_fit.predict(X_test)]
+        return (logit_fit, Y_test, logit_predicts)
+
+
 if __name__ == '__main__':
     '''
     TODO reduce false positives
     '''
+    spambase_models = SpamBaseModels()
     ML_functions = [ 
-                    gaussian_bayes_spam_filter,
-                    bernoulli_bayes_spam_filter,
-                    logit_spam_filter,
-                    neural_network_spam_filter,
-                    support_vector_spam_filter,
-                    k_nearest_neighbors_spam_filter,
-                    random_forest_spam_filter
+                    spambase_models.gaussian_bayes_spam_filter,
+                    spambase_models.bernoulli_bayes_spam_filter,
+                    spambase_models.logit_spam_filter,
+                    spambase_models.neural_network_spam_filter,
+                    spambase_models.support_vector_spam_filter,
+                    spambase_models.k_nearest_neighbors_spam_filter,
+                    spambase_models.random_forest_spam_filter
                    ] 
 
     #  functions for model diagnostics
